@@ -1,0 +1,51 @@
+- name: Deploy web server and runners 
+  hosts: api
+  become: True
+  become_method: sudo
+  tags: code 
+  tasks:
+    # webserver
+    - name: stop service
+      shell: service webserver stop
+    - name: copy webserver service
+      copy: src=./webserver.service dest=/lib/systemd/system/webserver.service
+    - name: copy binary
+      copy: src=../../crufter_linux_amd64 consulfixer.service dest=/usr/bin/crufter
+    - name: make sure cruft is executable
+      shell: chmod 755 /usr/bin/crufter
+    - name: reload systemd services
+      shell: systemctl daemon-reload
+    - name: start service
+      shell: service webserver start
+    
+    ### images    
+
+    # noderunner
+    - name: create noderunner folder
+      file: path=/var/runners/node state=directory
+    - name: copy and build node runner
+      copy: src=../../runners/node/Dockerfile dest=/var/runners/node/Dockerfile
+    - name: runner
+      copy: src=../../runners/node/run.sh dest=/var/runners/node/run.sh
+    - name: build node runner
+      shell: cd /var/runners/node; docker build -t noderunner .
+    
+    # haskell runner 
+    - name: create haskell folder
+      file: path=/var/runners/haskell state=directory
+    - name: copy and build haskell runner
+      copy: src=../../runners/haskell/Dockerfile dest=/var/runners/haskell/Dockerfile
+    - name: runner
+      copy: src=../../runners/haskell/run.sh dest=/var/runners/haskell/run.sh
+    - name: build haskell runner
+      shell: cd /var/runners/haskell; docker build -t haskellrunner .
+
+    # shell runner 
+    - name: create shell folder
+      file: path=/var/runners/shell state=directory
+    - name: copy and build shell runner
+      copy: src=../../runners/shell/Dockerfile dest=/var/runners/shell/Dockerfile
+    - name: runner
+      copy: src=../../runners/shell/run.sh dest=/var/runners/shell/run.sh
+    - name: build shell runner
+      shell: cd /var/runners/shell; docker build -t shellrunner .
