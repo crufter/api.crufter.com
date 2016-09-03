@@ -10,7 +10,7 @@
     - name: copy webserver service
       copy: src=./webserver.service dest=/lib/systemd/system/webserver.service
     - name: copy binary
-      copy: src=../../crufter_linux_amd64 consulfixer.service dest=/usr/bin/crufter
+      copy: src=../../api.crufter.com_linux_amd64 consulfixer.service dest=/usr/bin/crufter
     - name: make sure cruft is executable
       shell: chmod 755 /usr/bin/crufter
     - name: reload systemd services
