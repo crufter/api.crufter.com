@@ -6,6 +6,7 @@
   tasks:
     # webserver
     - name: stop service
+      ignore_errors: true
       shell: service webserver stop
     - name: copy webserver service
       copy: src=./webserver.service dest=/lib/systemd/system/webserver.service
